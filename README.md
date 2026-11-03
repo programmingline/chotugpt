@@ -9,7 +9,7 @@ A tiny GPT, built from scratch, one lecture at a time — the companion code for
 1. Watch the lecture.
 2. Pause and type the code yourself (typing beats copy-paste).
 3. Run it and compare your output with the video.
-4. Stuck? Compare with the lecture's tag (`lecture-02`, `lecture-03`, …), then ask in the YouTube comments.
+4. Stuck? Compare with the lecture's branch (`lecture-02`, `lecture-03`, …), then ask in the YouTube comments.
 
 ```bash
 git clone https://github.com/programmingline/chotugpt.git
