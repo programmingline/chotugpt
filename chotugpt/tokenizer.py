@@ -2,7 +2,10 @@
 
 Lecture 2: a character-level tokenizer — every unique character gets a number.
 Lecture 15: a small byte-pair encoding (BPE) tokenizer, the same idea GPT-2 uses.
+Lecture 22: save / load the trained tokenizer as JSON, and make training and encoding fast
+            enough for a real corpus (count each distinct word once, remember encoded words).
 """
+import json
 import re
 
 
@@ -27,11 +30,13 @@ class CharTokenizer:
 SPLIT = re.compile(r" ?[^\s,.!?]+| ?[,.!?]+|\s+")
 
 
-def count_pairs(chunks):
+def count_pairs(chunks, freqs=None):
+    """How often each neighbouring pair appears. freqs[i] = how many times chunk i occurs (default 1)."""
     counts = {}
-    for ids in chunks:
+    for n, ids in enumerate(chunks):
+        f = 1 if freqs is None else freqs[n]
         for pair in zip(ids, ids[1:]):
-            counts[pair] = counts.get(pair, 0) + 1
+            counts[pair] = counts.get(pair, 0) + f
     return counts
 
 
@@ -53,15 +58,22 @@ class BPETokenizer:
     def __init__(self):
         self.merges = {}                                          # (id, id) -> new id, in the order learned
         self.vocab = {i: bytes([i]) for i in range(256)}          # id -> the bytes it stands for
+        self.cache = {}                                           # word -> its token ids, filled by encode
 
     @property
     def vocab_size(self):
         return len(self.vocab)
 
     def train(self, text, num_merges, verbose=False):
-        chunks = [list(c.encode("utf-8")) for c in SPLIT.findall(text)]
+        self.cache = {}                                           # new merges make old encodings stale
+        # a corpus repeats the same words again and again: keep each distinct chunk once, with its count
+        word_counts = {}
+        for c in SPLIT.findall(text):
+            word_counts[c] = word_counts.get(c, 0) + 1
+        chunks = [list(c.encode("utf-8")) for c in word_counts]
+        freqs = list(word_counts.values())
         for k in range(num_merges):
-            counts = count_pairs(chunks)
+            counts = count_pairs(chunks, freqs)
             if not counts:
                 break
             pair = max(counts, key=counts.get)                    # the most frequent pair
@@ -72,13 +84,18 @@ class BPETokenizer:
             if verbose:
                 print(f"merge {k + 1}: {self.vocab[new_id].decode('utf-8', 'replace')!r} ({counts[pair]} times)")
 
-    def encode(self, text):
-        out = []
-        for c in SPLIT.findall(text):
+    def encode_chunk(self, c):
+        if c not in self.cache:                                   # each distinct word is merged only once
             ids = list(c.encode("utf-8"))
             for pair, new_id in self.merges.items():              # replay the merges in the order learned
                 ids = merge(ids, pair, new_id)
-            out.extend(ids)
+            self.cache[c] = ids
+        return self.cache[c]
+
+    def encode(self, text):
+        out = []
+        for c in SPLIT.findall(text):
+            out.extend(self.encode_chunk(c))
         return out
 
     def decode(self, ids):
@@ -86,6 +103,21 @@ class BPETokenizer:
 
     def tokens(self, text):
         return [self.vocab[i].decode("utf-8", errors="replace") for i in self.encode(text)]
+
+    def save(self, path):
+        """Only the merges need saving: the vocabulary can be rebuilt from them."""
+        merges = [[a, b, new_id] for (a, b), new_id in self.merges.items()]
+        with open(path, "w") as f:
+            json.dump({"type": "byte-level BPE", "merges": merges}, f)
+
+    @classmethod
+    def load(cls, path):
+        tok = cls()
+        with open(path) as f:
+            for a, b, new_id in json.load(f)["merges"]:           # replay the merges in the saved order
+                tok.merges[(a, b)] = new_id
+                tok.vocab[new_id] = tok.vocab[a] + tok.vocab[b]
+        return tok
 
 
 if __name__ == "__main__":
