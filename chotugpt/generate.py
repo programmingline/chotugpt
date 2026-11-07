@@ -5,6 +5,8 @@ Lecture 28: decoding — how we turn the model's probabilities into actual words
     temperature  divide the scores by T before softmax: T < 1 sharper, T > 1 flatter
     top-k        keep only the k most likely tokens
     top-p        keep the smallest set of tokens whose probabilities add up to p ("nucleus")
+Lecture 29: generate_cached — the same loop with a KV cache: after the prompt, every step
+            feeds the model just ONE new token instead of the whole text again.
 """
 import torch
 import torch.nn.functional as F
@@ -44,4 +46,23 @@ def greedy(model, idx, max_new_tokens):
         logits, _ = model(idx[:, -model.cfg.block_size:])
         nxt = logits[0, -1].argmax()
         idx = torch.cat([idx, nxt.view(1, 1)], dim=1)
+    return idx
+
+
+@torch.no_grad()
+def generate_cached(model, idx, max_new_tokens, temperature=1.0, top_k=None, top_p=None,
+                    generator=None, do_sample=True):
+    """Like generate (or greedy, with do_sample=False), but with a KV cache.
+    The prompt plus the new tokens must fit in block_size."""
+    cache = model.new_kv_cache()
+    logits, _ = model(idx, kv_cache=cache)                         # "prefill": the whole prompt, once
+    for step in range(max_new_tokens):
+        if do_sample:
+            probs = next_token_probs(logits[0, -1], temperature, top_k, top_p)
+            nxt = torch.multinomial(probs, 1, generator=generator)
+        else:
+            nxt = logits[0, -1].argmax()
+        idx = torch.cat([idx, nxt.view(1, 1)], dim=1)
+        if step < max_new_tokens - 1:
+            logits, _ = model(nxt.view(1, 1), kv_cache=cache)       # just the new token
     return idx

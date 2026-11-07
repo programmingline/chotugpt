@@ -19,21 +19,38 @@ python lectures/lecture02_check_setup.py
 python -m chotugpt.tokenizer
 ```
 
+From lecture 22 on, run the scripts from the repository root, in order — each one makes what the next needs:
+
+```bash
+python lectures/lecture23_prepare_data.py   # data/chai_corpus.txt, data/train.bin, data/val.bin, data/tokenizer.json
+python lectures/lecture24_train.py          # checkpoints/chotugpt.pt (about 4 minutes on a laptop CPU)
+python lectures/lecture26_sft.py            # checkpoints/chotugpt_sft.pt (needed by lecture 27)
+```
+
+Generated files (`checkpoints/`, `data/*.bin`, `data/chai_corpus.txt`) are not in git: the scripts make them again,
+with exactly the same numbers (fixed seeds).
+
 ## What grows here
 
 | File | What it does | Added in |
 | --- | --- | --- |
-| `chotugpt/tokenizer.py` | text → numbers (characters now, BPE from lecture 15) | lecture 2 |
+| `chotugpt/tokenizer.py` | text → numbers (characters now, BPE from lecture 15; save / load as JSON from lecture 22) | lectures 2, 15, 22 |
 | `chotugpt/nn.py` | neural-network building blocks: `Linear`, `relu`, `gelu` (NumPy); `backward`, `step`, `mse_loss` for training | lectures 12–13 |
 | `lectures/lecture03_tiny_eliza.py` … `lecture09_few_shot.py` | small history demos: ELIZA, bigrams, word vectors, fading RNN memory, attention, self-attention, few-shot prompts | lectures 3–9 |
 | `lectures/lecture12_neural_network.py` | one neuron and a tiny 3 → 4 → 2 network | lecture 12 |
 | `lectures/lecture13_one_weight.py`, `lecture13_gradient_descent.py` | loss, gradient descent and backprop: one weight by hand, then a neuron learns a pattern | lecture 13 |
 | `chotugpt/embedding.py` | embedding table, positional encoding, RoPE (NumPy) | lectures 16–17 |
 | `chotugpt/attention.py` | softmax, causal mask, CausalSelfAttention (NumPy) | lectures 18–19 |
-| `chotugpt/model.py` | the transformer | Module 4 |
-| `chotugpt/train.py` | teaching the model | Module 5 |
-| `chotugpt/generate.py` | making it write | Module 6 |
-| `data/` | training text | Module 5 |
+| `chotugpt/block.py` | LayerNorm, MLP (feed-forward) and the pre-norm transformer `Block` (NumPy) | lecture 20 |
+| `chotugpt/model.py` | the full GPT in PyTorch: `GPTConfig`, `GPT` (~0.9 M parameters); KV cache from lecture 29 | lectures 21, 29 |
+| `lectures/lecture22_forward_pass.py` | one forward pass through the untrained model, every shape printed | lecture 22 |
+| `data/make_corpus.py`, `chotugpt/data.py` | synthetic chai-diary corpus; cleaning, train/val split, BPE tokenizer (`data/tokenizer.json`), `train.bin` / `val.bin` | lecture 23 |
+| `chotugpt/train.py` | the training loop: batches, AdamW, train/val loss, checkpoints | lecture 24 |
+| `lectures/lecture25_scaling.py` | scaling-law and GPU-memory arithmetic | lecture 25 |
+| `chotugpt/sft.py` | supervised fine-tuning on a chat template, loss only on the assistant's words | lecture 26 |
+| `chotugpt/dpo.py` | preference tuning with DPO | lecture 27 |
+| `chotugpt/generate.py` | greedy, temperature, top-k, top-p; `generate_cached` with the KV cache | lectures 28–29 |
+| `data/` | `make_corpus.py` and the trained tokenizer `tokenizer.json` (committed); the corpus and `.bin` files are made by lecture 23 | lectures 22–23 |
 | `notebooks/` | Colab notebooks | as we go |
 
 ## Our running example
