@@ -23,11 +23,13 @@ python -m chotugpt.tokenizer
 
 | File | What it does | Added in |
 | --- | --- | --- |
-| `chotugpt/tokenizer.py` | text → numbers (characters now, BPE in lecture 15) | lecture 2 |
+| `chotugpt/tokenizer.py` | text → numbers (characters now, BPE from lecture 15) | lecture 2 |
 | `chotugpt/nn.py` | neural-network building blocks: `Linear`, `relu`, `gelu` (NumPy); `backward`, `step`, `mse_loss` for training | lectures 12–13 |
 | `lectures/lecture03_tiny_eliza.py` … `lecture09_few_shot.py` | small history demos: ELIZA, bigrams, word vectors, fading RNN memory, attention, self-attention, few-shot prompts | lectures 3–9 |
 | `lectures/lecture12_neural_network.py` | one neuron and a tiny 3 → 4 → 2 network | lecture 12 |
 | `lectures/lecture13_one_weight.py`, `lecture13_gradient_descent.py` | loss, gradient descent and backprop: one weight by hand, then a neuron learns a pattern | lecture 13 |
+| `chotugpt/embedding.py` | embedding table, positional encoding, RoPE (NumPy) | lectures 16–17 |
+| `chotugpt/attention.py` | softmax, causal mask, CausalSelfAttention (NumPy) | lectures 18–19 |
 | `chotugpt/model.py` | the transformer | Module 4 |
 | `chotugpt/train.py` | teaching the model | Module 5 |
 | `chotugpt/generate.py` | making it write | Module 6 |
