@@ -24,7 +24,7 @@ From lecture 22 on, run the scripts from the repository root, in order — each 
 ```bash
 python lectures/lecture23_prepare_data.py   # data/chai_corpus.txt, data/train.bin, data/val.bin, data/tokenizer.json
 python lectures/lecture24_train.py          # checkpoints/chotugpt.pt (about 4 minutes on a laptop CPU)
-python lectures/lecture26_sft.py            # checkpoints/chotugpt_sft.pt (needed by lecture 27)
+python lectures/lecture26_sft.py            # checkpoints/chotugpt_sft.pt (needed by lectures 27 and 31)
 ```
 
 Generated files (`checkpoints/`, `data/*.bin`, `data/chai_corpus.txt`) are not in git: the scripts make them again,
@@ -51,6 +51,7 @@ with exactly the same numbers (fixed seeds).
 | `chotugpt/dpo.py` | preference tuning with DPO | lecture 27 |
 | `chotugpt/generate.py` | greedy, temperature, top-k, top-p; `generate_cached` with the KV cache | lectures 28–29 |
 | `chotugpt/moe.py`, `lectures/lecture30_moe.py` | Mixture of Experts (8 experts, top-2 router); grouped-query attention KV-cache sizes | lecture 30 |
+| `lectures/lecture31_prompting.py` | context in the prompt, retrieval (RAG), a calculator tool | lecture 31 |
 | `data/` | `make_corpus.py` and the trained tokenizer `tokenizer.json` (committed); the corpus and `.bin` files are made by lecture 23 | lectures 22–23 |
 | `notebooks/` | Colab notebooks | as we go |
 
