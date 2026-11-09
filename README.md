@@ -24,7 +24,7 @@ From lecture 22 on, run the scripts from the repository root, in order — each 
 ```bash
 python lectures/lecture23_prepare_data.py   # data/chai_corpus.txt, data/train.bin, data/val.bin, data/tokenizer.json
 python lectures/lecture24_train.py          # checkpoints/chotugpt.pt (about 4 minutes on a laptop CPU)
-python lectures/lecture26_sft.py            # checkpoints/chotugpt_sft.pt (needed by lectures 27 and 31)
+python lectures/lecture26_sft.py            # checkpoints/chotugpt_sft.pt (needed by lectures 27, 31 and 32)
 ```
 
 Generated files (`checkpoints/`, `data/*.bin`, `data/chai_corpus.txt`) are not in git: the scripts make them again,
@@ -52,6 +52,7 @@ with exactly the same numbers (fixed seeds).
 | `chotugpt/generate.py` | greedy, temperature, top-k, top-p; `generate_cached` with the KV cache | lectures 28–29 |
 | `chotugpt/moe.py`, `lectures/lecture30_moe.py` | Mixture of Experts (8 experts, top-2 router); grouped-query attention KV-cache sizes | lecture 30 |
 | `lectures/lecture31_prompting.py` | context in the prompt, retrieval (RAG), a calculator tool | lecture 31 |
+| `lectures/lecture32_finale.py` | hallucinations, a 20-prompt evaluation, the full journey of our sentence | lecture 32 |
 | `data/` | `make_corpus.py` and the trained tokenizer `tokenizer.json` (committed); the corpus and `.bin` files are made by lecture 23 | lectures 22–23 |
 | `notebooks/` | Colab notebooks | as we go |
 
@@ -62,3 +63,25 @@ Every lecture follows one sentence through the model:
 ```
 After my morning chai, I feel ___
 ```
+
+## How to run the whole course
+
+From the repository root, in this order (each step makes what the next one needs; same seeds, same numbers):
+
+```bash
+pip install -r requirements.txt
+python lectures/lecture02_check_setup.py
+# lectures 3–22: small standalone demos, any order
+python lectures/lecture23_prepare_data.py   # corpus, tokenizer, train.bin / val.bin
+python lectures/lecture24_train.py          # checkpoints/chotugpt.pt       (~4 minutes on a laptop CPU)
+python lectures/lecture25_scaling.py
+python lectures/lecture26_sft.py            # checkpoints/chotugpt_sft.pt
+python lectures/lecture27_dpo.py
+python lectures/lecture28_decoding.py
+python lectures/lecture29_kv_cache.py
+python lectures/lecture30_moe.py
+python lectures/lecture31_prompting.py      # ~20 seconds: includes a short "read the note" fine-tune
+python lectures/lecture32_finale.py
+```
+
+Two bonus lectures follow: 33 (LoRA fine-tuning) and 34 (the whole course in one script and in Google Colab).
