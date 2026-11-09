@@ -95,7 +95,8 @@ def finetune(model, examples, steps=150, batch_size=8, lr=3e-4, seed=26, log_eve
     for step in range(steps + 1):
         pick = torch.randint(len(examples), (batch_size,), generator=g)
         x, y = make_batch([examples[i] for i in pick])
-        _, loss = model(x, y)
+        device = next(model.parameters()).device              # lecture 34: CPU or GPU
+        _, loss = model(x.to(device), y.to(device))
         if step % log_every == 0:
             log.append((step, loss.item()))
         if step == steps:
@@ -111,7 +112,7 @@ def finetune(model, examples, steps=150, batch_size=8, lr=3e-4, seed=26, log_eve
 def reply(model, tok, question, max_new_tokens=48):
     """Greedy answer, stopped at <|end|>."""
     ids = tok.encode(prompt_text(question))
-    idx = torch.tensor([ids])
+    idx = torch.tensor([ids], device=next(model.parameters()).device)
     for _ in range(max_new_tokens):
         logits, _ = model(idx)
         idx = torch.cat([idx, logits[0, -1].argmax().view(1, 1)], dim=1)

@@ -54,8 +54,9 @@ with exactly the same numbers (fixed seeds).
 | `lectures/lecture31_prompting.py` | context in the prompt, retrieval (RAG), a calculator tool | lecture 31 |
 | `lectures/lecture32_finale.py` | hallucinations, a 20-prompt evaluation, the full journey of our sentence | lecture 32 |
 | `chotugpt/lora.py`, `lectures/lecture33_lora.py` | LoRA fine-tuning: frozen weights plus a small low-rank patch, and merging it | bonus lecture 33 |
+| `lectures/lecture34_full_run.py`, `notebooks/chotugpt_colab.ipynb` | the whole pipeline in one script / one Colab notebook (CPU or GPU) | bonus lecture 34 |
 | `data/` | `make_corpus.py` and the trained tokenizer `tokenizer.json` (committed); the corpus and `.bin` files are made by lecture 23 | lectures 22–23 |
-| `notebooks/` | Colab notebooks | as we go |
+| `notebooks/` | Colab notebooks (`chotugpt_colab.ipynb` runs the whole course) | as we go, lecture 34 |
 
 ## Our running example
 
@@ -85,3 +86,12 @@ python lectures/lecture31_prompting.py      # ~20 seconds: includes a short "rea
 python lectures/lecture32_finale.py
 python lectures/lecture33_lora.py           # bonus: LoRA, writes checkpoints/chotugpt_lora.pt
 ```
+
+Or do data → pretraining → SFT → chat in one go (bonus lecture 34):
+
+```bash
+python lectures/lecture34_full_run.py --quick   # 300 steps, about a minute; writes chotugpt_quick*.pt
+python lectures/lecture34_full_run.py           # the full 1,500 steps; the same checkpoints as lectures 24 and 26
+```
+
+No laptop? Open `notebooks/chotugpt_colab.ipynb` in Google Colab and pick a GPU runtime.
