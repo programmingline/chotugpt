@@ -50,6 +50,7 @@ with exactly the same numbers (fixed seeds).
 | `chotugpt/sft.py` | supervised fine-tuning on a chat template, loss only on the assistant's words | lecture 26 |
 | `chotugpt/dpo.py` | preference tuning with DPO | lecture 27 |
 | `chotugpt/generate.py` | greedy, temperature, top-k, top-p; `generate_cached` with the KV cache | lectures 28–29 |
+| `chotugpt/moe.py`, `lectures/lecture30_moe.py` | Mixture of Experts (8 experts, top-2 router); grouped-query attention KV-cache sizes | lecture 30 |
 | `data/` | `make_corpus.py` and the trained tokenizer `tokenizer.json` (committed); the corpus and `.bin` files are made by lecture 23 | lectures 22–23 |
 | `notebooks/` | Colab notebooks | as we go |
 
